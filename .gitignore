@@ -1,5 +1,7 @@
 venv
 .venv
 *.pyc
+*.swp
 *.sublime-*
 content/
+pbworks/

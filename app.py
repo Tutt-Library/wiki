@@ -147,7 +147,7 @@ class Page(object):
 
     def load(self):
         with open(self.path, 'rU') as f:
-            self.content = f.read().decode('utf-8')
+            self.content = f.read()
 
     def render(self):
         processed = Processors(self.content)
@@ -160,9 +160,9 @@ class Page(object):
         with open(self.path, 'w') as f:
             for key, value in self._meta.items():
                 line = u'%s: %s\n' % (key, value)
-                f.write(line.encode('utf-8'))
-            f.write('\n'.encode('utf-8'))
-            f.write(self.body.replace('\r\n', '\n').encode('utf-8'))
+                f.write(line)
+            f.write('\n')
+            f.write(self.body.replace('\r\n', '\n'))
         if update:
             self.load()
             self.render()
@@ -175,7 +175,7 @@ class Page(object):
         item = self._meta[name]
         if len(item) == 1:
             return item[0]
-        print item
+        print(item)
         return item
 
     def __setitem__(self, name, value):
@@ -265,7 +265,7 @@ class Wiki(object):
         path = self.path(url)
         if not self.exists(url):
             return False
-        print path
+        print(path)
         os.remove(path)
         return True
 
@@ -691,4 +691,5 @@ def page_not_found(e):
 
 
 if __name__ == '__main__':
-    manager.run()
+    #manager.run()
+    app.run(debug=True)
