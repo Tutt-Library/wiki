@@ -131,7 +131,7 @@ class Processors(object):
         md = markdown.Markdown(['codehilite', 'fenced_code', 'meta', 'tables'])
         html = md.convert(self.content)
         phtml = self.post(html)
-        body = self.content.split('\n\n', 1)[1]
+        body = self.content #self.content.splitlines()
         meta = md.Meta
         return phtml, body, meta
 
@@ -146,8 +146,8 @@ class Page(object):
             self.render()
 
     def load(self):
-        with open(self.path, 'rU') as f:
-            self.content = f.read()
+        with open(self.path, 'rb') as f:
+            self.content = f.read().decode()
 
     def render(self):
         processed = Processors(self.content)
@@ -692,4 +692,4 @@ def page_not_found(e):
 
 if __name__ == '__main__':
     #manager.run()
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=8085)
