@@ -147,6 +147,7 @@ class Page(object):
 
     def load(self):
         with open(self.path, 'rb') as f:
+            print(self.path)
             self.content = f.read().decode()
 
     def render(self):
