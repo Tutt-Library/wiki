@@ -7,13 +7,10 @@ import json
 from functools import wraps
 from flask import (Flask, render_template, flash, redirect, url_for, request,
                    abort)
-from flask.ext.wtf import Form
-from wtforms import (BooleanField, TextField, TextAreaField, PasswordField)
-from wtforms.validators import (InputRequired, ValidationError)
 from flask.ext.login import (LoginManager, login_required, current_user,
                              login_user, logout_user)
 from flask.ext.script import Manager
-
+#from forms import URLForm, SearchForm, EditorForm, LoginForm
 
 """
     Application Setup
@@ -147,7 +144,6 @@ class Page(object):
 
     def load(self):
         with open(self.path, 'rb') as f:
-            print(self.path)
             self.content = f.read().decode()
 
     def render(self):
@@ -474,49 +470,9 @@ def protect(f):
     return wrapper
 
 
-"""
-    Forms
-    ~~~~~
-"""
 
 
-class URLForm(Form):
-    url = TextField('', [InputRequired()])
 
-    def validate_url(form, field):
-        if wiki.exists(field.data):
-            raise ValidationError('The URL "%s" exists already.' % field.data)
-
-    def clean_url(self, url):
-        return Processors().clean_url(url)
-
-
-class SearchForm(Form):
-    term = TextField('', [InputRequired()])
-    ignore_case = BooleanField(description='Ignore Case', default=app.config.get('DEFAULT_SEARCH_IGNORE_CASE', True))
-
-
-class EditorForm(Form):
-    title = TextField('', [InputRequired()])
-    body = TextAreaField('', [InputRequired()])
-    tags = TextField('')
-
-
-class LoginForm(Form):
-    name = TextField('', [InputRequired()])
-    password = PasswordField('', [InputRequired()])
-
-    def validate_name(form, field):
-        user = users.get_user(field.data)
-        if not user:
-            raise ValidationError('This username does not exist.')
-
-    def validate_password(form, field):
-        user = users.get_user(form.name.data)
-        if not user:
-            return
-        if not user.check_password(field.data):
-            raise ValidationError('Username and password do not match.')
 
 
 wiki = Wiki(app.config.get('CONTENT_DIR'))
@@ -690,6 +646,7 @@ def user_delete(user_id):
 def page_not_found(e):
     return render_template('404.html'), 404
 
+from forms import URLForm, SearchForm, EditorForm, LoginForm
 
 if __name__ == '__main__':
     #manager.run()
