@@ -1,8 +1,10 @@
 import binascii
+import datetime
 import hashlib
 import os
 import re
 import markdown
+import time
 import json
 from functools import wraps
 from flask import (Flask, render_template, flash, redirect, url_for, request,
@@ -10,6 +12,8 @@ from flask import (Flask, render_template, flash, redirect, url_for, request,
 from flask.ext.login import (LoginManager, login_required, current_user,
                              login_user, logout_user)
 from flask.ext.script import Manager
+
+from git import Repo
 #from forms import URLForm, SearchForm, EditorForm, LoginForm
 
 """
@@ -34,7 +38,7 @@ loginmanager = LoginManager()
 loginmanager.init_app(app)
 loginmanager.login_view = 'user_login'
 
-
+wiki_content_git = Repo('E:/2016/tutt-library-wiki-content/')
 
 """
     Wiki classes
@@ -128,7 +132,12 @@ class Processors(object):
         md = markdown.Markdown(['codehilite', 'fenced_code', 'meta', 'tables'])
         html = md.convert(self.content)
         phtml = self.post(html)
-        body = self.content #self.content.splitlines()
+        content_lines = self.content.splitlines()
+        for i,line in enumerate(content_lines):
+            # Keep iterating to first empty line
+            if len(line) < 1:
+                body = '\n'.join(content_lines[i:])
+                break
         meta = md.Meta
         return phtml, body, meta
 
@@ -485,6 +494,19 @@ def load_user(name):
     return users.get_user(name)
 
 
+"""
+    Filters
+"""
+@app.template_filter('epoch2iso')
+def timestamp_iso(timestamp):
+    time_of = datetime.datetime.fromtimestamp(int(timestamp))
+    return time_of.isoformat()
+
+
+@app.template_filter('epoch2wiki')
+def timestamp_wiki(timestamp):
+    time_of = datetime.datetime.fromtimestamp(int(timestamp))
+    return time_of.strftime("%I:%M %p on %B %d, %Y")
 
 """
     Routes
@@ -512,7 +534,10 @@ def index():
 @protect
 def display(url):
     page = wiki.get_or_404(url)
-    return render_template('page.html', page=page)
+    return render_template('page.html', 
+        page=page, 
+        last_five=list(wiki_content_git.iter_commits('active', max_count=5))
+    )
 
 
 @app.route('/create/', methods=['GET', 'POST'])
@@ -534,6 +559,7 @@ def edit(url):
             page = wiki.get_bare(url)
         form.populate_obj(page)
         page.save()
+        print("User is {}".format(current_user))
         flash('"%s" was saved.' % page.title, 'success')
         return redirect(url_for('display', url=url))
     return render_template('editor.html', form=form, page=page)

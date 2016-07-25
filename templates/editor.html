@@ -5,26 +5,36 @@ Wiki Editor
 {%- endblock title %}
 
 {% block content %}
-<ul class="nav nav-tabs">
-	<li class="active"><a href="#editor" data-toggle="tab">Editor</a></li>
-	<li><a href="#preview" data-toggle="tab" id="previewlink">Preview</a></li>
+<ul class="nav nav-tabs" role="tablist">
+	<li class="nav-item">
+            <a href="#editor" class="nav-link active" data-toggle="tab" role="tab">Editor</a>
+        </li>
+	<li class="nav-item">
+            <a href="#preview" 
+               class="nav-link" 
+               data-toggle="tab" id="previewlink" role="tab">Preview</a></li>
 </ul>
 <div class="tab-content">
-	<div class="tab-pane active" id="editor">
+	<div class="tab-pane active" id="editor" role="tabpanel">
 		<form method="post" class="form">
 			{{ form.hidden_tag() }}
-			{{ input(form.title, placeholder="Title", class="span7") }}
-			{{ input(form.body, placeholder="Markdown", class="span7", rows="20") }}
-			{{ input(form.tags, placeholder="Tags (comma separated)", class="span7") }}
-			<div class="form-actions">
-        <div class="pull-left">
-          <a class="btn" href="#preview" id="previewbtn">Preview</a>
-        </div>
-				<div class="pull-right">
-          <a class="btn" href="{{ url_for('display', url=page.url) }}">Cancel</a>
-					<button class="btn btn-success" type="submit">Save</button>
-				</div>
-			</div>
+                        <div class="col-md-7"> 
+			{{ input(form.title, placeholder="Title", class="form-control") }}
+                        </div>
+                        <div class="col-md-10"> 
+			{{ input(form.body, placeholder="Markdown", class="form-control", rows="20") }}
+                        </div>
+                        <div class="col-md-7"> 
+                        <label>Tags (comma separated)</label>
+			{{ input(form.tags, placeholder="Tags (comma separated)", class="form-control") }}
+                        </div>
+                        <div class="col-md-7 m-t-2">
+    			    <div class="btn-group">
+                                <a class="btn btn-secondary" href="#preview" id="previewbtn">Preview</a>
+                                <a class="btn btn-secondary" href="{{ url_for('display', url=page.url) }}">Cancel</a>
+			        <button class="btn btn-success" type="submit">Save</button>
+			    </div>
+                        </div>
 		</form>
 	</div>
 	<div class="tab-pane" id="preview"></div>
